@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+fileList=$(git diff --diff-filter=d --cached --name-only | grep -E '\.(js|vue)$')
+if [ ${#fileList} -lt 1 ]; then
+    echo -e "You have no staged .js or .vue files to test\n"
+    exit
+fi
+npx eslint ${fileList[*]} "$@"
+git add ${fileList[*]}
+if [ $? -ne 0 ]; then
+    echo -e "\nPlease fix the above linting issues before committing.\n"
+    exit 1
+fi
